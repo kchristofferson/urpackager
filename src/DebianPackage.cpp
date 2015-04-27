@@ -5,6 +5,10 @@
  *      Author: kurt
  */
 
+#include <stdint.h>
+#include <string>
+
+#include "DependencyNameResolver.h"
 #include "DebianPackage.h"
 
 namespace ur {
@@ -14,7 +18,12 @@ DebianPackage::DebianPackage(ur::PackageControl &pc,
 		std::string &arch,
 		std::string &section,
 		std::string &type,
-		std::string &location) {
+		std::string &location,
+	  std::string &host,
+	  std::string &database,
+	  std::string &dbuser,
+	  std::string &password,
+	  uint32_t port) {
 	// TODO Auto-generated constructor stub
 
 	m_bIsRos = pc.is_ros();
@@ -25,6 +34,11 @@ DebianPackage::DebianPackage(ur::PackageControl &pc,
 	m_sSection = section;
 	m_sDebianType = type;
 	m_pathDebianLocation = boost::filesystem::path(location);
+  m_sDBHost = host;
+  m_sDBDatabase = database;
+  m_sDBUser = dbuser;
+  m_sDBPassword = password;
+  m_uiDBPort = port;
 	m_sPriority = pc.getPriority();
 	m_pathInstallPrefix = pc.getInstallPrefix();
 	m_pathStageBase = pc.getStageBase();
@@ -42,12 +56,12 @@ DebianPackage::DebianPackage(ur::PackageControl &pc,
 	m_vMaintainer = px.getMaintainers();
 	m_vAuthor = px.getAuthors();
 	m_vUrl = px.getUrls();
-    m_vBuildtoolDepend = px.getBuildtoolDependencies();
-    m_vBuildDepend = px.getBuildDependencies();
-    m_vRunDepend = px.getRunDependencies();
-    m_vTestDepend = px.getTestDependencies();
-    m_vConflict = px.getConflicts();
-    m_vReplace = px.getReplacements();
+  m_vBuildtoolDepend = px.getBuildtoolDependencies();
+  m_vBuildDepend = px.getBuildDependencies();
+  m_vRunDepend = px.getRunDependencies();
+  m_vTestDepend = px.getTestDependencies();
+  m_vConflict = px.getConflicts();
+  m_vReplace = px.getReplacements();
 }
 
 DebianPackage::~DebianPackage() {
@@ -311,9 +325,10 @@ void DebianPackage::setDebianPackageName(void) {
 }
 
 void DebianPackage::outputRelationVector(const unsigned int reltype, ur::vRelation &rel, std::fstream &f) {
-    bool first = true;
+  bool first = true;
 	std::vector<ur::relation>::iterator itrel;
 	ur::relation r;
+	ur::DependencyNameResolver resolver(m_sDBHost, m_sDBDatabase, m_sDBUser, m_sDBPassword, m_uiDBPort);
 
 	switch (reltype) {
 	case RELATION_DEPENDS :
@@ -367,6 +382,9 @@ void DebianPackage::outputRelationVector(const unsigned int reltype, ur::vRelati
 		else {
 			first = false;
 		}
+
+		if ( resolver.in_release(r.sVal, m_sROSVersion) )
+		  r.sVal = "ros-" + m_sROSVersion + "-" + r.sVal;
 
 	    f << r.sVal;
 	    switch (r.iVerType) {

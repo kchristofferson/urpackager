@@ -7,6 +7,7 @@
 //============================================================================
 
 #include <iostream>
+#include <stdlib.h>
 #include <string>
 
 #include <errno.h>
@@ -56,6 +57,11 @@ int main(int argc, const char *argv[]) {
 	std::string sLogFormat;
 	std::string sDebianLocation;
 	std::string sDebianType;
+	std::string sDBHost;
+	std::string sDBDatabase;
+	uint32_t uiDBPort;
+	std::string sDBUser;
+	std::string sDBPassword;
 
 	boost::filesystem::path idir;
 	// capture the directory from which urpackager was run.
@@ -126,7 +132,17 @@ int main(int argc, const char *argv[]) {
 		("debian.type", boost::program_options::value<std::string>()->default_value("deb"),
 				"Package either a binary (type = \"deb\") or a micro binary (type = \"udeb\")")
 		("debian.location", boost::program_options::value<std::string>(),
-				"Directory into which to place the debian file");
+				"Directory into which to place the debian file")
+    ("database.host", boost::program_options::value<std::string>(),
+	      "The host where the urpackage db is running")
+    ("database.database", boost::program_options::value<std::string>(),
+        "The mysql schema")
+    ("database.port", boost::program_options::value<int>(),
+        "The port on which the database is listening")
+    ("database.user", boost::program_options::value<std::string>(),
+        "The user of the database")
+    ("database.password", boost::program_options::value<std::string>(),
+        "Password to log into the database");
 		boost::program_options::options_description hidden("Hidden"); // command line or configuration file/environment but not shown
 
 		hidden.add_options()("administrator", boost::program_options::value<std::string>(),
@@ -231,6 +247,20 @@ int main(int argc, const char *argv[]) {
 			sPackageControlFile = sWorkingDir + "/pkgcontrol/" + sPackageName +
 					              "." + sArchitecture + ".pkgctl";
 		}
+    if (vm.count("database.host"))
+      sDBHost = (const std::string&) vm["database.host"].as<std::string>();
+
+    if (vm.count("database.database"))
+      sDBDatabase = (const std::string&) vm["database.database"].as<std::string>();
+
+    if (vm.count("database.port"))
+      uiDBPort = (unsigned int) vm["database.port"].as<int>();
+
+    if (vm.count("database.user"))
+      sDBUser = (const std::string&) vm["database.user"].as<std::string>();
+
+    if (vm.count("database.password"))
+      sDBPassword = (const std::string&) vm["database.password"].as<std::string>();
 
 	} catch (std::exception& e) {
 		std::cerr << "Unhandled Exception reached after applying all options: "
@@ -255,7 +285,12 @@ int main(int argc, const char *argv[]) {
 			              sArchitecture,
 					      sSection,
 					      sDebianType,
-					      sDebianLocation);
+					      sDebianLocation,
+					      sDBHost,
+					      sDBDatabase,
+					      sDBUser,
+					      sDBPassword,
+					      uiDBPort);
 
 	pkg.createStageDirectory();
 	pkg.stageManifest();
@@ -289,8 +324,17 @@ static void urpackagerConfFileCreate(void) {
 	of << "location = /mnt/build/stage/debs" << std::endl;
 	of << "type = deb" << std::endl;
 	of << "#" << std::endl << std::endl;
-	of << "[ros]" << std::endl;
-	of << "version = indigo" << std::endl;
-	of << "#" << std::endl << std::endl;
+  of << "[ros]" << std::endl;
+  of << "version = indigo" << std::endl;
+  of << "#" << std::endl << std::endl;
+
+  of << "# These values MUST be set for the connection to a mysql db" << std::endl;
+  of << "[database]" << std::endl;
+  of << "host = " << std::endl;
+  of << "database = packager" << std::endl;
+  of << "port = " << std::endl;
+  of << "user = " << std::endl;
+  of << "password = " << std::endl;
+  of << "#" << std::endl << std::endl;
 	of.close();
 }

@@ -48,6 +48,11 @@ private:
 	std::string m_sDebianType;
 	std::string m_sROSVersion;
 	std::string m_sPriority;
+	std::string m_sDBHost;
+	std::string m_sDBDatabase;
+	std::string m_sDBUser;
+	std::string m_sDBPassword;
+	uint32_t m_uiDBPort;
 	boost::filesystem::path m_pathInstallPrefix;
 	boost::filesystem::path m_pathStageDir;
 	boost::filesystem::path m_pathStageBase;
@@ -62,25 +67,30 @@ private:
 	ur::vPerson m_vMaintainer;
 	ur::vPerson m_vAuthor;
 	ur::vUrl m_vUrl;
-    ur::vRelation m_vBuildtoolDepend;
-    ur::vRelation m_vBuildDepend;
-    ur::vRelation m_vRunDepend;
-    ur::vRelation m_vTestDepend;
-    ur::vRelation m_vConflict;
-    ur::vRelation m_vReplace;
+  ur::vRelation m_vBuildtoolDepend;
+  ur::vRelation m_vBuildDepend;
+  ur::vRelation m_vRunDepend;
+  ur::vRelation m_vTestDepend;
+  ur::vRelation m_vConflict;
+  ur::vRelation m_vReplace;
 
-    void setDebianPackageName(void);
-    void outputRelationVector(const unsigned int reltype,
-    		                  ur::vRelation &rel,
-							  std::fstream &f);
+  void setDebianPackageName(void);
+  void outputRelationVector(const unsigned int reltype,
+                            ur::vRelation &rel,
+                            std::fstream &f);
 
 public:
 	DebianPackage(ur::PackageControl &pc,
-			      ur::PackageXML &px,
-				  std::string &arch,
-				  std::string &sect,
-				  std::string &type,
-				  std::string &location);
+	              ur::PackageXML &px,
+				        std::string &arch,
+				        std::string &sect,
+				        std::string &type,
+				        std::string &location,
+				        std::string &host,
+				        std::string &database,
+				        std::string &dbuser,
+				        std::string &password,
+				        uint32_t port);
 	virtual ~DebianPackage();
 
 	void stageManifest(void);

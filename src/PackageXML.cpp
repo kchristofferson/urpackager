@@ -376,9 +376,10 @@ void PackageXML::readPersons(boost::property_tree::ptree &t,
 }
 
 void PackageXML::readRelations(boost::property_tree::ptree &t,
-		        std::string child,
-				std::string first,
-				ur::vRelation &result) {
+                               std::string child,
+				                       std::string first,
+				                       ur::vRelation &result)
+{
 	ur::relation r;
 
 	BOOST_FOREACH(boost::property_tree::ptree::value_type &v,
