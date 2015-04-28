@@ -16,12 +16,11 @@ namespace ur {
 class MysqlConnection {
 private:
   uint32_t m_uiAffectedRows;
-  MYSQL mysql;
-  MYSQL *conn;
+  MYSQL m_mysql;
+  MYSQL *m_conn;
 
 public:
-  MysqlConnection(std::string host, std::string db, uint32_t port);
-  MysqlConnection(std::string host, std::string db, std::string user, std::string pass, uint32_t port);
+  MysqlConnection();
   virtual ~MysqlConnection();
 
   void close(void);

@@ -383,6 +383,7 @@ void DebianPackage::outputRelationVector(const unsigned int reltype, ur::vRelati
 			first = false;
 		}
 
+		std::replace(r.sVal.begin(), r.sVal.end(), '_', '-');
 		if ( resolver.in_release(r.sVal, m_sROSVersion) )
 		  r.sVal = "ros-" + m_sROSVersion + "-" + r.sVal;
 

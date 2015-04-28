@@ -14,6 +14,7 @@ class MysqlRow {
 private:
   MYSQL_RES *m_Result;
   MYSQL_ROW m_Fields;
+  unsigned long *m_Lengths;
 
 public:
   MysqlRow(MYSQL_RES *res, MYSQL_ROW row);

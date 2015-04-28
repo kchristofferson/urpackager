@@ -19,7 +19,7 @@ private:
   std::string m_sDB;
   std::string m_sUser;
   std::string m_sPassword;
-  ur::MysqlConnection *m_db;
+  ur::MysqlConnection m_db;
 
   void connectDatabase(void);
 
